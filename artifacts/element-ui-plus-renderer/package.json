@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "scripts": {
-    "dev": "cross-env VITE_PORT=3004 vite",
+    "dev": "cross-env vite",
     "build": "vite build --emptyOutDir",
     "generate": "vite-ssg build",
     "preview": "vite preview",

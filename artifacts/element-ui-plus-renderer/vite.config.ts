@@ -24,7 +24,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3004,
+    port: 3034,
   },
   build: {
     // 确保生成的资源使用相对路径
