@@ -1,5 +1,5 @@
 export interface CodeRendererProps {
-  codeRendererServer: string
+  codeRendererServer: string // url
   onFixError?: (errorMessage: string) => void
   codes: {
     [key: string]: string

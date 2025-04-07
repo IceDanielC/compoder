@@ -34,7 +34,13 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({
   useEffect(() => {
     const modules: ModuleCache = {}
 
+    /**
+     * 处理文件, 执行代码, 并返回模块的 exports
+     * @param filename 文件名
+     * @returns 返回模块的 exports
+     */
     const processFile = (filename: string): any => {
+      // 如果模块已经存在, 直接返回模块的 exports
       if (modules[filename]) {
         return modules[filename].exports
       }
@@ -43,6 +49,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({
         throw new Error(`File not found: ${filename}`)
       }
 
+      // 使用 babel 转换代码, 将 esm 转换为 cjs
       const transformedCode = transform(code, {
         filename,
         presets: ["react", "env", "typescript"],
@@ -52,20 +59,15 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({
       const exports: ExportsObject = {}
       const myModule = { exports }
 
-      const ComponentModule = new Function(
-        "require",
-        "module",
-        "exports",
-        "__filename",
-        "React",
-        transformedCode!,
-      )
-
-      ComponentModule(
-        (importPath: string) => {
+      // 创建模块执行的上下文
+      const moduleContext = {
+        require: (importPath: string) => {
           const resolvedPath = importPath.startsWith(".")
             ? path.join(path.dirname(filename), importPath).replace(/^\//, "")
             : importPath
+
+          // importPath: ./StyledLoginPage react antd @ant-design/icons ./styles 等
+          // resolvedPath: StyledLoginPage react antd @ant-design/icons styles 等
 
           const possiblePaths = [
             resolvedPath,
@@ -76,6 +78,7 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({
             resolvedPath.replace(/\.(ts|tsx)$/, ""),
           ]
 
+          // 处理找到存在于 files 中的路径，即非外部依赖
           const normalizedPath = Object.keys(files).find(file =>
             possiblePaths.includes(file),
           )
@@ -191,11 +194,18 @@ const DynamicComponentRenderer: React.FC<DynamicComponentRendererProps> = ({
             throw error
           }
         },
-        myModule,
+        module: myModule,
         exports,
-        filename,
-        require("react"),
-      )
+        __filename: filename,
+        React: require("react"),
+      }
+
+      // 使用 eval 执行代码，并提供模块上下文
+      eval(`
+        (function(require, module, exports, __filename, React) {
+          ${transformedCode}
+        }).call(moduleContext, moduleContext.require, moduleContext.module, moduleContext.exports, moduleContext.__filename, moduleContext.React);
+      `)
 
       modules[filename] = myModule
       return myModule.exports

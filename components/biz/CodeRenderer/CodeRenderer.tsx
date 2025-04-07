@@ -6,6 +6,7 @@ import { ErrorToast } from "./ErrorToast"
 import { ControlBar } from "./ControlBar"
 import { ResizableFrame } from "./ResizableFrame"
 
+// 渲染器组件，用于渲染代码
 export const CodeRenderer: FC<CodeRendererProps> = ({
   codeRendererServer,
   onFixError,
@@ -73,6 +74,7 @@ export const CodeRenderer: FC<CodeRendererProps> = ({
 
   useEffect(() => {
     if (isIframeLoaded && !!codes) {
+      console.info("【沙箱加载完成】：", codes)
       sendMessage()
     }
   }, [codes, isIframeLoaded, sendMessage])

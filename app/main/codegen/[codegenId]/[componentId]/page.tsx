@@ -322,6 +322,7 @@ const CodeRenderer = ({
   codeRendererUrl: string
 }) => {
   const { files } = useFile()
+  // 将文件内容转换为对象，key是文件名，value是文件内容
   const codes = files.reduce((acc, file) => {
     if (file.content) {
       acc[file.name] = file.content

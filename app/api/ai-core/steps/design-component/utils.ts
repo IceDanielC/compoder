@@ -230,7 +230,7 @@ export async function generateComponentDesign(
       // Try to extract JSON from the response
       const jsonMatch = accumulatedJson.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
-        throw new Error("No valid JSON found in the response")
+        throw new Error(`AI返回：${accumulatedJson} 请继续输入你的需求～`)
       }
 
       console.log("jsonMatch", jsonMatch[0])
