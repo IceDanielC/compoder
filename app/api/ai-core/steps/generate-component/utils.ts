@@ -11,6 +11,7 @@ import {
 const generateOutputSpecification = (
   rules: WorkflowContext["query"]["rules"],
 ): string => {
+  // 代码输出规范限制
   const fileStructure = getFileStructureRule(rules)
   if (!fileStructure) return ""
 
@@ -83,11 +84,15 @@ export const buildSystemPrompt = (
 ): string => {
   // Generate each section
   const outputSpecification = generateOutputSpecification(rules)
+  // 代码样式限制
   const styleSpecification = generateStyleSpecification(rules)
+  // 开源组件
   const openSourceComponents = generateOpenSourceComponents(rules)
+  // 私有组件
   const privateComponents = generatePrivateComponents(
     retrievedAugmentationContent,
   )
+  // 额外规则
   const additionalRules = generateAdditionalRules(rules)
 
   // Check if component usage guidelines exist
